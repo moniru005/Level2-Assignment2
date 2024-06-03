@@ -18,6 +18,7 @@ const ProductSchema = z.object({
   tags: z.array(z.string()),
   variants: z.array(VariantSchema),
   inventory: InventorySchema,
+  isDeleted: z.boolean(),
 })
 
 export default ProductSchema
