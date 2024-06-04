@@ -1,24 +1,24 @@
 import { z } from 'zod'
 
-const VariantSchema = z.object({
+const VariantValidationSchema = z.object({
   type: z.string(),
   value: z.string(),
 })
 
-const InventorySchema = z.object({
+const InventoryValidationSchema = z.object({
   quantity: z.number(),
   inStock: z.boolean(),
 })
 
-const ProductSchema = z.object({
+export const ProductValidationSchema = z.object({
   name: z.string(),
   description: z.string(),
   price: z.number(),
   category: z.string(),
   tags: z.array(z.string()),
-  variants: z.array(VariantSchema),
-  inventory: InventorySchema,
-  isDeleted: z.boolean(),
+  variants: z.array(VariantValidationSchema),
+  inventory: InventoryValidationSchema,
+  isDeleted: z.boolean().optional(),
 })
 
-export default ProductSchema
+export default ProductValidationSchema

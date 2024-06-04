@@ -15,5 +15,5 @@ export interface IProduct {
   tags: string[]
   variants: IVariant[]
   inventory: IInventory
-  isDeleted: boolean
+  isDeleted?: boolean
 }

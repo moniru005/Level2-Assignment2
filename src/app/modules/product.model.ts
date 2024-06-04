@@ -4,13 +4,13 @@ import { IProduct } from './product/product.interface'
 interface IProductDocument extends IProduct, Document {}
 
 const VariantSchema = new Schema({
-  type: { type: String, required: true },
-  value: { type: String, required: true },
+  type: { type: String },
+  value: { type: String },
 })
 
 const InventorySchema: Schema = new Schema({
-  quantity: { type: Number, required: true },
-  inStock: { type: Boolean, required: true },
+  quantity: { type: Number },
+  inStock: { type: Boolean },
 })
 
 const ProductSchema: Schema = new Schema({
@@ -21,8 +21,19 @@ const ProductSchema: Schema = new Schema({
   tags: { type: [String], required: true },
   variants: { type: [VariantSchema], required: true },
   inventory: { type: InventorySchema, required: true },
+  isDeleted: { type: Boolean, default: false },
 })
 
-const Product = mongoose.model<IProductDocument>('Product', ProductSchema)
+ProductSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } })
+  next()
+})
 
-export default Product
+ProductSchema.pre('findOne', function (next) {
+  this.findOne({ isDeleted: { $ne: true } })
+  next()
+})
+
+const ProductModel = mongoose.model<IProductDocument>('Product', ProductSchema)
+
+export default ProductModel
