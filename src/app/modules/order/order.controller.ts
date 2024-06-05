@@ -11,12 +11,19 @@ const createOrder = async (req: Request, res: Response) => {
       message: 'Order created successfully!',
       data: result,
     })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Something went wrong!',
-      data: error,
-    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.name === 'InsufficientQuantityError') {
+      res.status(400).json({
+        success: false,
+        message: 'Insufficient quantity available in inventory',
+      })
+    } else {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      })
+    }
   }
 }
 
@@ -46,7 +53,33 @@ const getOrders = async (req: Request, res: Response) => {
   }
 }
 
+const getOrderById = async (req: Request, res: Response) => {
+  try {
+    const orderId = req.params.id
+    const result = await orderService.getOrderByIdFromDB(orderId)
+    res.status(200).json({
+      success: true,
+      message: 'Order fetched successfully!',
+      data: result,
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.name === 'NotFoundError') {
+      res.status(404).json({
+        success: false,
+        message: 'Order Not found',
+      })
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Something went error!',
+      })
+    }
+  }
+}
+
 export const orderController = {
   createOrder,
   getOrders,
+  getOrderById,
 }
