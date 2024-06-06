@@ -38,7 +38,6 @@ npm install
 NODE_ENV= development
 PORT = 5000
 DATABASE_URL = mongodb+srv://ecomAdmin:buSMOoDDp8Kd6l4B@mumbaicluster.krljslb.mongodb.net/ecom-project?retryWrites=true&w=majority&appName=MumbaiCluster
-PORT=5000
 ```
 
 Replace mongodb://localhost:27017/yourdbname with your actual MongoDB connection string.
