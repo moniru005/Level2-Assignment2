@@ -1,15 +1,17 @@
 import mongoose from 'mongoose'
 import config from './app/config'
-import app from './app'
-import { NextFunction, Request, Response } from 'express'
 import { orderRoutes } from './app/modules/order/order.route'
 import { ProductRoutes } from './app/modules/product/product.route'
+import express, { Application, Request, Response } from 'express'
+import cors from 'cors'
 
-// Product and Order Routes
-app.use('/api/products', ProductRoutes)
-app.use('/api/orders', orderRoutes)
+const app: Application = express()
 
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
+// parsers
+app.use(express.json())
+app.use(cors())
+
+app.get('/', (req: Request, res: Response) => {
   res.send(
     `
     <div>
@@ -19,16 +21,18 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
     </div/>
     `,
   )
-  next()
 })
 
+// Product and Order Routes
+app.use('/api/products', ProductRoutes)
+app.use('/api/orders', orderRoutes)
+
 // Routing Error Handling
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',
   })
-  next()
 })
 
 async function main() {

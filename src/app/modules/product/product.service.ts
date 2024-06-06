@@ -2,7 +2,9 @@ import ProductModel from '../product.model'
 import { IProduct } from './product.interface'
 
 const createProductIntoDB = async (productData: IProduct) => {
-  const result = await ProductModel.create(productData)
+  // const result = await ProductModel.create(productData)
+  const result = new ProductModel(productData)
+  await result.save()
   return result
 }
 

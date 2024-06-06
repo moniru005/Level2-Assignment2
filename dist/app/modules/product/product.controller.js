@@ -13,8 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductController = void 0;
-const product_service_1 = require("./product.service");
 const product_validation_1 = __importDefault(require("./product.validation"));
+const product_service_1 = require("./product.service");
+const zod_1 = require("zod");
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const zodParsedData = product_validation_1.default.parse(req.body);
@@ -26,11 +27,13 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Failed to create product',
-            error: error,
-        });
+        if (error instanceof zod_1.z.ZodError) {
+            return res.status(400).json({
+                success: false,
+                message: error.errors,
+            });
+        }
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

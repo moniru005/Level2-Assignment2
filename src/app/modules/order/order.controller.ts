@@ -1,29 +1,60 @@
 import { Request, Response } from 'express'
-import orderValidation from './order.validation'
 import { orderService } from './order.service'
+import { orderSchemaValidation } from './order.validation'
+import ProductModel from '../product.model'
+import { IOrder } from './order.interface'
 
 const createOrder = async (req: Request, res: Response) => {
   try {
-    const orderParseData = orderValidation.parse(req.body)
-    const result = await orderService.createOrderFromDB(orderParseData)
-    res.status(200).json({
-      success: true,
-      message: 'Order created successfully!',
-      data: result,
-    })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    if (error.name === 'InsufficientQuantityError') {
-      res.status(400).json({
+    const parsed = orderSchemaValidation.safeParse(req.body)
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors: parsed.error.errors,
+      })
+    }
+    const { email, productId, price, quantity }: IOrder = parsed.data
+
+    // Check product inventory
+    const product = await ProductModel.findById(productId)
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      })
+    }
+    if (product.inventory.quantity < quantity) {
+      return res.status(400).json({
         success: false,
         message: 'Insufficient quantity available in inventory',
       })
-    } else {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      })
     }
+
+    // Update product inventory
+    product.inventory.quantity -= quantity
+    product.inventory.inStock = product.inventory.quantity > 0
+    await product.save()
+
+    // Create order
+    const newOrder = await orderService.createOrderFromDB({
+      email,
+      productId,
+      price,
+      quantity,
+    })
+
+    res.status(201).json({
+      success: true,
+      message: 'Order created successfully!',
+      data: newOrder,
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    })
   }
 }
 

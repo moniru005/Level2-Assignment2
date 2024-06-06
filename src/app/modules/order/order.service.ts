@@ -1,26 +1,11 @@
 import OrderModel from '../order.model'
-import ProductModel from '../product.model'
+// import ProductModel from '../product.model'
 import { IOrder } from './order.interface'
 
 const createOrderFromDB = async (orderData: IOrder) => {
-  const product = await ProductModel.findById(orderData.productId)
-
-  if (!product || product.isDeleted) {
-    throw new Error('Product not found or has been deleted')
-  }
-
-  if (orderData.quantity > product.inventory.quantity) {
-    const error = new Error('Insufficient quantity available in inventory')
-    error.name = 'InsufficientQuantityError'
-    throw error
-  }
-
-  product.inventory.quantity -= orderData.quantity
-  product.inventory.inStock = product.inventory.quantity > 0
-
-  const order = new OrderModel(orderData)
-  await order.save()
-  return order.toObject()
+  const result = new OrderModel(orderData)
+  await result.save()
+  return result
 }
 
 const getOrdersFromDB = async (email?: string) => {

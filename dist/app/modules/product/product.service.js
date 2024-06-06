@@ -15,7 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductService = void 0;
 const product_model_1 = __importDefault(require("../product.model"));
 const createProductIntoDB = (productData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield product_model_1.default.create(productData);
+    // const result = await ProductModel.create(productData)
+    const result = new product_model_1.default(productData);
+    yield result.save();
     return result;
 });
 const getProductFromDB = (searchTerm) => __awaiter(void 0, void 0, void 0, function* () {

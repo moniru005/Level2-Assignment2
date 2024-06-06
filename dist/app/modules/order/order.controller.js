@@ -13,32 +13,57 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderController = void 0;
-const order_validation_1 = __importDefault(require("./order.validation"));
 const order_service_1 = require("./order.service");
+const order_validation_1 = require("./order.validation");
+const product_model_1 = __importDefault(require("../product.model"));
 const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const orderParseData = order_validation_1.default.parse(req.body);
-        const result = yield order_service_1.orderService.createOrderFromDB(orderParseData);
-        res.status(200).json({
-            success: true,
-            message: 'Order created successfully!',
-            data: result,
-        });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }
-    catch (error) {
-        if (error.name === 'InsufficientQuantityError') {
-            res.status(400).json({
+        const parsed = order_validation_1.orderSchemaValidation.safeParse(req.body);
+        if (!parsed.success) {
+            return res.status(400).json({
+                success: false,
+                message: 'Validation error',
+                errors: parsed.error.errors,
+            });
+        }
+        const { email, productId, price, quantity } = parsed.data;
+        // Check product inventory
+        const product = yield product_model_1.default.findById(productId);
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found',
+            });
+        }
+        if (product.inventory.quantity < quantity) {
+            return res.status(400).json({
                 success: false,
                 message: 'Insufficient quantity available in inventory',
             });
         }
-        else {
-            res.status(400).json({
-                success: false,
-                message: error.message,
-            });
-        }
+        // Update product inventory
+        product.inventory.quantity -= quantity;
+        product.inventory.inStock = product.inventory.quantity > 0;
+        yield product.save();
+        // Create order
+        const newOrder = yield order_service_1.orderService.createOrderFromDB({
+            email,
+            productId,
+            price,
+            quantity,
+        });
+        res.status(201).json({
+            success: true,
+            message: 'Order created successfully!',
+            data: newOrder,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+        });
     }
 });
 const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

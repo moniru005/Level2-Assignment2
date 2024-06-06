@@ -14,22 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderService = void 0;
 const order_model_1 = __importDefault(require("../order.model"));
-const product_model_1 = __importDefault(require("../product.model"));
 const createOrderFromDB = (orderData) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = yield product_model_1.default.findById(orderData.productId);
-    if (!product || product.isDeleted) {
-        throw new Error('Product not found or has been deleted');
-    }
-    if (orderData.quantity > product.inventory.quantity) {
-        const error = new Error('Insufficient quantity available in inventory');
-        error.name = 'InsufficientQuantityError';
-        throw error;
-    }
-    product.inventory.quantity -= orderData.quantity;
-    product.inventory.inStock = product.inventory.quantity > 0;
-    const order = new order_model_1.default(orderData);
-    yield order.save();
-    return order.toObject();
+    const result = new order_model_1.default(orderData);
+    yield result.save();
+    return result;
 });
 const getOrdersFromDB = (email) => __awaiter(void 0, void 0, void 0, function* () {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
