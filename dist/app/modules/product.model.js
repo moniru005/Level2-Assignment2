@@ -25,12 +25,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const VariantSchema = new mongoose_1.Schema({
-    type: { type: String },
-    value: { type: String },
+    type: { type: String, require: true },
+    value: { type: String, require: true },
 });
 const InventorySchema = new mongoose_1.Schema({
-    quantity: { type: Number },
-    inStock: { type: Boolean },
+    quantity: { type: Number, require: true },
+    inStock: { type: Boolean, require: true },
 });
 const ProductSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
@@ -40,7 +40,7 @@ const ProductSchema = new mongoose_1.Schema({
     tags: { type: [String], required: true },
     variants: { type: [VariantSchema], required: true },
     inventory: { type: InventorySchema, required: true },
-    isDeleted: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false, require: false },
 });
 ProductSchema.pre('find', function (next) {
     this.find({ isDeleted: { $ne: true } });

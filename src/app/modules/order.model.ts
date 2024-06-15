@@ -4,10 +4,10 @@ import { IOrder } from './order/order.interface'
 interface IOrderDocument extends IOrder, Document {}
 
 const OrderSchema: Schema = new Schema({
-  email: { type: String, required: false },
-  productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
-  price: { type: Number, required: true },
-  quantity: { type: Number, required: true },
+  email: { type: String },
+  productId: { type: Schema.Types.ObjectId, ref: 'Product'},
+  price: { type: Number},
+  quantity: { type: Number },
 })
 
 const OrderModel = mongoose.model<IOrderDocument>('Order', OrderSchema)

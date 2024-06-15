@@ -14,38 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("./app/config"));
-const order_route_1 = require("./app/modules/order/order.route");
-const product_route_1 = require("./app/modules/product/product.route");
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
-const app = (0, express_1.default)();
-// parsers
-app.use(express_1.default.json());
-app.use((0, cors_1.default)());
-app.get('/', (req, res) => {
-    res.send(`
-    <div>
-    <p>Ecommerce Server is Running on port 5000</p> 
-    <p>For Product searching please follow the route <a href="http://localhost:5000/api/products"> http://localhost:5000/api/products</a></p> 
-    <p>For Orders Route please follow the route <a href="http://localhost:5000/api/orders"> http://localhost:5000/api/orders </a></p>
-    </div/>
-    `);
-});
-// Product and Order Routes
-app.use('/api/products', product_route_1.ProductRoutes);
-app.use('/api/orders', order_route_1.orderRoutes);
-// Routing Error Handling
-app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Route not found',
-    });
-});
+const app_1 = __importDefault(require("./app"));
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield mongoose_1.default.connect(config_1.default.database_url);
-            app.listen(config_1.default.port, () => {
+            app_1.default.listen(config_1.default.port, () => {
                 console.log(`Ecommerce app is listening on port ${config_1.default.port}`);
             });
         }
@@ -54,4 +28,4 @@ function main() {
         }
     });
 }
-exports.default = main();
+main();

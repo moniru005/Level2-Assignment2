@@ -26,32 +26,27 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 errors: parsed.error.errors,
             });
         }
-        const { email, productId, price, quantity } = parsed.data;
+        const orderData = parsed.data;
         // Check product inventory
-        const product = yield product_model_1.default.findById(productId);
+        const product = yield product_model_1.default.findById(orderData.productId);
         if (!product) {
             return res.status(404).json({
                 success: false,
                 message: 'Product not found',
             });
         }
-        if (product.inventory.quantity < quantity) {
+        if (product.inventory.quantity < orderData.quantity) {
             return res.status(400).json({
                 success: false,
                 message: 'Insufficient quantity available in inventory',
             });
         }
         // Update product inventory
-        product.inventory.quantity -= quantity;
+        product.inventory.quantity -= orderData.quantity;
         product.inventory.inStock = product.inventory.quantity > 0;
         yield product.save();
         // Create order
-        const newOrder = yield order_service_1.orderService.createOrderFromDB({
-            email,
-            productId,
-            price,
-            quantity,
-        });
+        const newOrder = yield order_service_1.orderService.createOrderFromDB(orderData);
         res.status(201).json({
             success: true,
             message: 'Order created successfully!',

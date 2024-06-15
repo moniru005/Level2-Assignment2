@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request, Response } from 'express'
 import { orderService } from './order.service'
 import { orderSchemaValidation } from './order.validation'
@@ -14,17 +15,17 @@ const createOrder = async (req: Request, res: Response) => {
         errors: parsed.error.errors,
       })
     }
-    const { email, productId, price, quantity }: IOrder = parsed.data
+    const orderData: IOrder = parsed.data
 
     // Check product inventory
-    const product = await ProductModel.findById(productId)
+    const product = await ProductModel.findById(orderData.productId)
     if (!product) {
       return res.status(404).json({
         success: false,
         message: 'Product not found',
       })
     }
-    if (product.inventory.quantity < quantity) {
+    if (product.inventory.quantity < orderData.quantity) {
       return res.status(400).json({
         success: false,
         message: 'Insufficient quantity available in inventory',
@@ -32,17 +33,12 @@ const createOrder = async (req: Request, res: Response) => {
     }
 
     // Update product inventory
-    product.inventory.quantity -= quantity
+    product.inventory.quantity -= orderData.quantity
     product.inventory.inStock = product.inventory.quantity > 0
     await product.save()
 
     // Create order
-    const newOrder = await orderService.createOrderFromDB({
-      email,
-      productId,
-      price,
-      quantity,
-    })
+    const newOrder = await orderService.createOrderFromDB(orderData)
 
     res.status(201).json({
       success: true,

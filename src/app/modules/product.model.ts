@@ -4,13 +4,13 @@ import { IProduct } from './product/product.interface'
 interface IProductDocument extends IProduct, Document {}
 
 const VariantSchema = new Schema({
-  type: { type: String },
-  value: { type: String },
+  type: { type: String, require: true },
+  value: { type: String, require: true },
 })
 
 const InventorySchema: Schema = new Schema({
-  quantity: { type: Number },
-  inStock: { type: Boolean },
+  quantity: { type: Number, require: true },
+  inStock: { type: Boolean, require: true },
 })
 
 const ProductSchema: Schema = new Schema({
@@ -21,7 +21,7 @@ const ProductSchema: Schema = new Schema({
   tags: { type: [String], required: true },
   variants: { type: [VariantSchema], required: true },
   inventory: { type: InventorySchema, required: true },
-  isDeleted: { type: Boolean, default: false },
+  isDeleted: { type: Boolean, default: false, require: false },
 })
 
 ProductSchema.pre('find', function (next) {
