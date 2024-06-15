@@ -49,7 +49,7 @@ DATABASE_URL = mongodb+srv://ecomAdmin:buSMOoDDp8Kd6l4B@mumbaicluster.krljslb.mo
 
 ### Search for products
 
-- Endpoint: /api/products?searchTerm=iphone
+- Endpoint: /api/products?searchTerm=onetouch
 - Method: GET
 
 ### Get all orders
@@ -59,7 +59,7 @@ DATABASE_URL = mongodb+srv://ecomAdmin:buSMOoDDp8Kd6l4B@mumbaicluster.krljslb.mo
 
 ### Retrieve orders by user email
 
-- Endpoint: /api/orders?email=level2@programming-hero.com
+- Endpoint: /api/orders?email=moniru005@gmail.com
 - Method: GET
 
 ## Error Handling
